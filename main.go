@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexzanser/rest-server-go.git/taskstore"
+	"github.com/alexzanser/rest-server-go.git/server/taskstore"
 )
 
 type taskServer struct {
