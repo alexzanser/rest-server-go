@@ -34,20 +34,15 @@ func (c *Client) CreateTask(j *Job) error {
 	if err != nil {
 		return fmt.Errorf("error %v while setting request", err)
 	}
-	req.Header.Set("Accept", "application/json")
-	resp, err := c.Do(req)
+	req.Header.Set("Content-Type", "application/json")
+	_ , err = c.Do(req)
 
 	if err != nil {
 		return fmt.Errorf("error %v while getting respons", err)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("unable to get response body %v", err)
 	}
-
-	fmt.Println(string(body), resp.StatusCode)
-	defer resp.Body.Close()
-
 	return nil
 }
 
@@ -67,7 +62,7 @@ func (c *Client) GetAllTasks() (*[]Job, error) {
 
 	defer resp.Body.Close()
 	var data []Job
-	fmt.Println(body)
+
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshal json %v", err)
@@ -88,6 +83,6 @@ func main() {
 			Due: time.Date(2007, time.Month(10), 5, 4, 3, 2, 1, &time.Location{}),
 	}
 	c.CreateTask(&jobs[0])
-	c.GetAllTasks()
-	// fmt.Println(*data)
+	data, _  := c.GetAllTasks()
+	fmt.Println(data)
 }
