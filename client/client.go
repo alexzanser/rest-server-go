@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -88,7 +89,11 @@ func main() {
 			Due: time.Date(2007, time.Month(10), 5, 4, 3, 2, 1, &time.Location{}),
 	}
 	c.CreateTask(&jobs[0])
-	data, _ := c.GetAllTasks()
+	data, err := c.GetAllTasks()
+	if err != nil {
+		log.Printf("error while receiving data %s", err)
+		return 
+	} 
 	for _, line := range *data {
 		fmt.Println(line)
 	}
