@@ -86,7 +86,7 @@ func (ts *TaskStore) GetAllTasks() []Task {
 	ts.Lock()
 	defer ts.Unlock()
 
-	allTasks := make([]Task, len(ts.tasks))
+	allTasks := make([]Task, 0)
 	for _, el := range ts.tasks {
 		allTasks = append(allTasks, el)
 	}
@@ -125,6 +125,5 @@ func (ts *TaskStore) GetTasksByDueDate(year int, month time.Month, day int) []Ta
 			tasks = append(tasks, task)
 		}
 	}
-
 	return tasks
 }

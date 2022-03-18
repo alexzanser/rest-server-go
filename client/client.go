@@ -32,7 +32,7 @@ func (c *Client) CreateTask(j *Job) error {
 	}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(js)))
 	if err != nil {
-		return fmt.Errorf("error %v while setting request", err)
+		return fmt.Errorf("error %v while setting create task request", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	_ , err = c.Do(req)
@@ -47,15 +47,20 @@ func (c *Client) CreateTask(j *Job) error {
 }
 
 func (c *Client) GetAllTasks() (*[]Job, error) {
-	// req, err := http.NewRequest("GET", )
+	url := c.Host + c.BasePath + "/"
 
-	resp, err := http.Get(c.Host + c.BasePath)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error %v while setting get all tasks request", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp , err := c.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error %v while getting respons", err)
 	}
 	
 	body, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
 		return nil, fmt.Errorf("unable to get response body %v", err)
 	}
@@ -83,6 +88,8 @@ func main() {
 			Due: time.Date(2007, time.Month(10), 5, 4, 3, 2, 1, &time.Location{}),
 	}
 	c.CreateTask(&jobs[0])
-	data, _  := c.GetAllTasks()
-	fmt.Println(data)
+	data, _ := c.GetAllTasks()
+	for _, line := range *data {
+		fmt.Println(line)
+	}
 }
