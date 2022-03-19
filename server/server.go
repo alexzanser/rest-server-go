@@ -14,6 +14,7 @@ import (
 )
 
 type taskServer struct {
+	http.Server
 	store *taskstore.TaskStore
 }
 
