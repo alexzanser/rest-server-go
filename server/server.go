@@ -7,7 +7,6 @@ import (
 	"mime"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/alexzanser/rest-server-go.git/taskstore"
@@ -115,38 +114,6 @@ func (ts *taskServer) GetTaskHandler(w http.ResponseWriter, req *http.Request) {
 	renderJSON(w, task)
 }
 
-func (ts *taskServer) TaskHandler(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path == "/task/" {
-		if req.Method == http.MethodPost {
-			ts.CreateTaskHandler(w, req)
-		} else if req.Method == http.MethodGet {
-			ts.GetAllTasksHandler(w, req)
-		} else if req.Method == http.MethodDelete {
-			ts.DeleteAllTasksHandler(w, req)
-		} else {
-			http.Error(w, fmt.Sprintf("expect method GET, DELETE or POST at /task/, got %v", req.Method), http.StatusMethodNotAllowed)
-			return
-		}
-	} else {
-		path := strings.Trim(req.URL.Path, "/")
-		pathParts := strings.Split(path, "/")
-
-		if len(pathParts) < 2 {
-			http.Error(w, "expect /task/<id> in task handler", http.StatusBadRequest)
-			return
-		}
-
-		if req.Method == http.MethodDelete {
-			ts.DeleteTaskHandler(w, req)
-		} else if req.Method == http.MethodGet {
-			ts.GetTaskHandler(w, req)
-		} else {
-			http.Error(w, fmt.Sprintf("expected method GET or DELETE at /task/<id> got %v", req.Method), http.StatusMethodNotAllowed)
-			return
-		}
-	}
-}
-
 func (ts *taskServer) TagHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling tasks by tag at %s\n", req.URL.Path)
 
@@ -184,3 +151,35 @@ func (ts *taskServer) DueHandler(w http.ResponseWriter, req *http.Request) {
 	tasks := ts.store.GetTasksByDueDate(year, time.Month(month), day)
 	renderJSON(w, tasks)
 }
+
+// func (ts *taskServer) TaskHandler(w http.ResponseWriter, req *http.Request) {
+// 	if req.URL.Path == "/task/" {
+// 		if req.Method == http.MethodPost {
+// 			ts.CreateTaskHandler(w, req)
+// 		} else if req.Method == http.MethodGet {
+// 			ts.GetAllTasksHandler(w, req)
+// 		} else if req.Method == http.MethodDelete {
+// 			ts.DeleteAllTasksHandler(w, req)
+// 		} else {
+// 			http.Error(w, fmt.Sprintf("expect method GET, DELETE or POST at /task/, got %v", req.Method), http.StatusMethodNotAllowed)
+// 			return
+// 		}
+// 	} else {
+// 		path := strings.Trim(req.URL.Path, "/")
+// 		pathParts := strings.Split(path, "/")
+
+// 		if len(pathParts) < 2 {
+// 			http.Error(w, "expect /task/<id> in task handler", http.StatusBadRequest)
+// 			return
+// 		}
+
+// 		if req.Method == http.MethodDelete {
+// 			ts.DeleteTaskHandler(w, req)
+// 		} else if req.Method == http.MethodGet {
+// 			ts.GetTaskHandler(w, req)
+// 		} else {
+// 			http.Error(w, fmt.Sprintf("expected method GET or DELETE at /task/<id> got %v", req.Method), http.StatusMethodNotAllowed)
+// 			return
+// 		}
+// 	}
+// }
