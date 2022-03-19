@@ -15,9 +15,11 @@ import (
 
 func main() {
 	//Context will be used in other processes
-	_, cancel := context.WithCancel(context.Background())
 
 	server := server.NewTaskServer()
+	
+	_, cancel := context.WithCancel(context.Background())
+
 	r := chi.NewRouter()
 
 	r.Post("/task/", server.CreateTaskHandler)
@@ -35,11 +37,11 @@ func main() {
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)
 	signal.Notify(sigquit, syscall.SIGINT, syscall.SIGTERM)
 	stopAppCh := make(chan struct{})
-
+	
 	go func() {
+		
 		log.Println("Captured signal: ", <- sigquit)
 		log.Println("Gracefully shutting down server ...")
-
 		cancel()
 
 		if err := server.Shutdown(context.Background()); err != nil {
@@ -47,7 +49,6 @@ func main() {
 		}
 		stopAppCh <- struct{}{}
 	}()
-
 	<- stopAppCh
 }
 
