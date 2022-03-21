@@ -8,17 +8,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	server "github.com/alexzanser/rest-server-go.git/internal/handlers"
+	task "github.com/alexzanser/rest-server-go.git/internal/handlers"
 	"github.com/go-chi/chi/v5"
 )
 
 func main() {
-	server := server.NewTaskServer()
+	server := task.NewTaskServer()
 	//Context will be used in other processes
 	_, cancel := context.WithCancel(context.Background())
 
 	r := chi.NewRouter()
-	
+	server.Handler = r	
 	r.Post("/task/", server.CreateTaskHandler)
 	r.Get("/task/", server.GetAllTasksHandler)
 	r.Get("/task/{id}", server.GetTaskHandler)
@@ -35,7 +35,7 @@ func main() {
 	<- gracefullShutDown(server, stopAppCh, cancel)
 }
 
-func gracefullShutDown(server *server.TaskServer,stopAppCh chan struct{}, cancel context.CancelFunc) <- chan struct{}{
+func gracefullShutDown(server *task.TaskServer,stopAppCh chan struct{}, cancel context.CancelFunc) <- chan struct{}{
 	sigquit := make(chan os.Signal, 1)
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)
 	signal.Notify(sigquit, syscall.SIGINT, syscall.SIGTERM)
