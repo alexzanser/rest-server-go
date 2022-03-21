@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +17,8 @@ func main() {
 	_, cancel := context.WithCancel(context.Background())
 
 	r := chi.NewRouter()
-	server.Handler = r	
+	server.Handler = r
+	server.Addr = "localhost:"+ os.Args[1]
 	r.Post("/task/", server.CreateTaskHandler)
 	r.Get("/task/", server.GetAllTasksHandler)
 	r.Get("/task/{id}", server.GetTaskHandler)
@@ -27,7 +27,7 @@ func main() {
 	r.Get("/due/{yy}/{mm}/{dd}", server.DueHandler)
 
 	go func() {
-		log.Fatal(http.ListenAndServe("localhost:"+ os.Args[1], r))
+		log.Fatal(server.ListenAndServe())
 	}()
 
 	//Gracefull shutdown
