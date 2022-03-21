@@ -8,20 +8,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/alexzanser/rest-server-go.git/server"
+	server "github.com/alexzanser/rest-server-go.git/internal/handlers"
 	"github.com/go-chi/chi/v5"
 )
 
-
 func main() {
-	//Context will be used in other processes
-
 	server := server.NewTaskServer()
-	
+	//Context will be used in other processes
 	_, cancel := context.WithCancel(context.Background())
 
 	r := chi.NewRouter()
-
+	
 	r.Post("/task/", server.CreateTaskHandler)
 	r.Get("/task/", server.GetAllTasksHandler)
 	r.Get("/task/{id}", server.GetTaskHandler)
@@ -29,17 +26,21 @@ func main() {
 	r.Get("/tag/{tagname}", server.TagHandler)
 	r.Get("/due/{yy}/{mm}/{dd}", server.DueHandler)
 
-	log.Fatal(http.ListenAndServe("localhost:"+os.Getenv("SERVERPORT"), r))
-
+	go func() {
+		log.Fatal(http.ListenAndServe("localhost:"+ os.Args[1], r))
+	}()
 
 	//Gracefull shutdown
+	stopAppCh := make(chan struct{})
+	<- gracefullShutDown(server, stopAppCh, cancel)
+}
+
+func gracefullShutDown(server *server.TaskServer,stopAppCh chan struct{}, cancel context.CancelFunc) <- chan struct{}{
 	sigquit := make(chan os.Signal, 1)
 	signal.Ignore(syscall.SIGHUP, syscall.SIGPIPE)
 	signal.Notify(sigquit, syscall.SIGINT, syscall.SIGTERM)
-	stopAppCh := make(chan struct{})
 	
-	go func() {
-		
+	go func() <- chan struct{} {
 		log.Println("Captured signal: ", <- sigquit)
 		log.Println("Gracefully shutting down server ...")
 		cancel()
@@ -48,17 +49,7 @@ func main() {
 			log.Println("Can't shutdown main server: ", err.Error())
 		}
 		stopAppCh <- struct{}{}
+		return stopAppCh
 	}()
-	<- stopAppCh
+	return stopAppCh
 }
-
-// func main() {
-// 	mux := http.NewServeMux()
-// 	server := server.NewTaskServer()
-	
-// 	mux.HandleFunc("/task/", server.TaskHandler)
-// 	mux.HandleFunc("/tag/", server.TagHandler)
-// 	mux.HandleFunc("/due/", server.DueHandler)
-
-// log.Fatal(http.ListenAndServe("localhost:"+os.Getenv("SERVERPORT"), mux))
-// }

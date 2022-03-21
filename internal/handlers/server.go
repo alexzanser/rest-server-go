@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"encoding/json"
@@ -9,18 +9,18 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alexzanser/rest-server-go.git/taskstore"
+	"github.com/alexzanser/rest-server-go.git/internal/taskstore"
 	"github.com/go-chi/chi/v5"
 )
 
-type taskServer struct {
+type TaskServer struct {
 	http.Server
 	store *taskstore.TaskStore
 }
 
-func NewTaskServer() *taskServer {
+func NewTaskServer() *TaskServer {
 	store := taskstore.New()
-	return &taskServer{store: store}
+	return &TaskServer{store: store}
 }
 
 func renderJSON(w http.ResponseWriter, v interface{}) {
@@ -33,7 +33,7 @@ func renderJSON(w http.ResponseWriter, v interface{}) {
 	w.Write(js)
 }
 
-func (ts *taskServer) CreateTaskHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) CreateTaskHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling create task at %s\n", req.URL.Path)
 
 	type RequestTask struct {
@@ -72,7 +72,7 @@ func (ts *taskServer) CreateTaskHandler(w http.ResponseWriter, req *http.Request
 	renderJSON(w, RespondeId{Id: id})
 }
 
-func (ts *taskServer) GetAllTasksHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) GetAllTasksHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling get all task at %s\n", req.URL.Path)
 
 	tasks := ts.store.GetAllTasks()
@@ -80,12 +80,12 @@ func (ts *taskServer) GetAllTasksHandler(w http.ResponseWriter, req *http.Reques
 
 }
 
-func (ts *taskServer) DeleteAllTasksHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) DeleteAllTasksHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling delete all tasks at %s\n", req.URL.Path)
 	ts.store.DeleteAllTasks()
 }
 
-func (ts *taskServer) DeleteTaskHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) DeleteTaskHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling delete task at %s\n", req.URL.Path)
 
 	id, err := strconv.Atoi(chi.URLParam(req, "id"))
@@ -99,7 +99,7 @@ func (ts *taskServer) DeleteTaskHandler(w http.ResponseWriter, req *http.Request
 	}
 }
 
-func (ts *taskServer) GetTaskHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) GetTaskHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling get task at %s\n", req.URL.Path)
 
 	id, err := strconv.Atoi(chi.URLParam(req, "id"))
@@ -115,7 +115,7 @@ func (ts *taskServer) GetTaskHandler(w http.ResponseWriter, req *http.Request) {
 	renderJSON(w, task)
 }
 
-func (ts *taskServer) TagHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) TagHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling tasks by tag at %s\n", req.URL.Path)
 
 	tag := chi.URLParam(req, "tagname")
@@ -127,7 +127,7 @@ func (ts *taskServer) TagHandler(w http.ResponseWriter, req *http.Request) {
 	renderJSON(w, tasks)
 }
 
-func (ts *taskServer) DueHandler(w http.ResponseWriter, req *http.Request) {
+func (ts *TaskServer) DueHandler(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling tasks by due at %s\n", req.URL.Path)
 
 	badRequestError := func() {
@@ -152,35 +152,3 @@ func (ts *taskServer) DueHandler(w http.ResponseWriter, req *http.Request) {
 	tasks := ts.store.GetTasksByDueDate(year, time.Month(month), day)
 	renderJSON(w, tasks)
 }
-
-// func (ts *taskServer) TaskHandler(w http.ResponseWriter, req *http.Request) {
-// 	if req.URL.Path == "/task/" {
-// 		if req.Method == http.MethodPost {
-// 			ts.CreateTaskHandler(w, req)
-// 		} else if req.Method == http.MethodGet {
-// 			ts.GetAllTasksHandler(w, req)
-// 		} else if req.Method == http.MethodDelete {
-// 			ts.DeleteAllTasksHandler(w, req)
-// 		} else {
-// 			http.Error(w, fmt.Sprintf("expect method GET, DELETE or POST at /task/, got %v", req.Method), http.StatusMethodNotAllowed)
-// 			return
-// 		}
-// 	} else {
-// 		path := strings.Trim(req.URL.Path, "/")
-// 		pathParts := strings.Split(path, "/")
-
-// 		if len(pathParts) < 2 {
-// 			http.Error(w, "expect /task/<id> in task handler", http.StatusBadRequest)
-// 			return
-// 		}
-
-// 		if req.Method == http.MethodDelete {
-// 			ts.DeleteTaskHandler(w, req)
-// 		} else if req.Method == http.MethodGet {
-// 			ts.GetTaskHandler(w, req)
-// 		} else {
-// 			http.Error(w, fmt.Sprintf("expected method GET or DELETE at /task/<id> got %v", req.Method), http.StatusMethodNotAllowed)
-// 			return
-// 		}
-// 	}
-// }
