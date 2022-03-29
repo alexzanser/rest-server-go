@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"stdlib_chi/internal/handlers"
+	task "stdlib_chi/internal/handlers"
 	"github.com/go-chi/chi/v5"
 )
 

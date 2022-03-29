@@ -8,11 +8,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"stdlib_chi_postgres/internal/taskstore"
+	task "stdlib_chi_postgres/internal/taskstore"
+
+	"github.com/go-chi/chi"
 )
 
 func main() {
-	
 	server := task.NewTaskServer()
 	//Context will be used in other processes
 	_, cancel := context.WithCancel(context.Background())
