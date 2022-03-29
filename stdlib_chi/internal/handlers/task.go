@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alexzanser/rest-server-go.git/internal/taskstore"
+	"stdlib_chi/internal/taskstore"
 	"github.com/go-chi/chi/v5"
 )
 

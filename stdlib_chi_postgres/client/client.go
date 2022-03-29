@@ -79,7 +79,7 @@ func (c *Client) GetAllTasks() (*[]Job, error) {
 
 func main() {
 	c := Client {
-		Host: "http://localhost:" + os.Args[1],
+		Host: "http://127.0.0.1:" + os.Args[1],
 		BasePath: "/task",
 	}
 	jobs := make([]Job, 1)

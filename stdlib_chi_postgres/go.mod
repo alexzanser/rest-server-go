@@ -1,4 +1,4 @@
-module stdlib_chi
+module stdlib_chi_postgres
 
 go 1.18
 

@@ -2,23 +2,25 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	task "github.com/alexzanser/rest-server-go.git/internal/handlers"
-	"github.com/go-chi/chi/v5"
+	"stdlib_chi_postgres/internal/taskstore"
 )
 
 func main() {
+	
 	server := task.NewTaskServer()
 	//Context will be used in other processes
 	_, cancel := context.WithCancel(context.Background())
 
 	r := chi.NewRouter()
 	server.Handler = r
-	server.Addr = "localhost:"+ os.Getenv("SERVERPORT")
+	server.Addr = ":" + os.Getenv("SERVERPORT")
+	fmt.Println(server.Addr)
 	r.Post("/task/", server.CreateTaskHandler)
 	r.Get("/task/", server.GetAllTasksHandler)
 	r.Get("/task/{id}", server.GetTaskHandler)

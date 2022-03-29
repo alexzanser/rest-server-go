@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: 
+      task_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVERPORT=4112 
+    ports:
+     - "4112:4112"
+    restart:
+      unless-stopped
+    depends_on:
+     - postgres
+    networks:
+     - backend
+  
+  postgres:
+    container_name: 
+      task_postgres
+    image: postgres:14
+    environment:
+      POSTGRES_DB: "taskstore"
+      POSTGRES_USER: "user_go"
+      POSTGRES_PASSWORD: "8956go"
+    ports:
+      - "5422:5432"
+    networks:
+     - backend
+
+networks:
+  backend:
+    driver:   
+      bridge
