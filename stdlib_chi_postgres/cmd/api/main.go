@@ -21,7 +21,7 @@ func main() {
 	r := chi.NewRouter()
 	server.Handler = r
 	server.Addr = ":" + os.Getenv("SERVERPORT")
-	fmt.Println(server.Addr)
+	log.Println(server.Addr)
 	r.Post("/task/", server.CreateTaskHandler)
 	r.Get("/task/", server.GetAllTasksHandler)
 	r.Get("/task/{id}", server.GetTaskHandler)
