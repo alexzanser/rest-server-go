@@ -1,0 +1,6 @@
+go 1.18
+
+use (
+	./stdlib_chi
+	./stdlib_chi_postgres
+)

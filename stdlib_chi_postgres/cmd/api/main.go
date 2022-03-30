@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	task "stdlib_chi_postgres/internal/taskstore"
+	task "stdlib_chi_postgres/internal/handlers"
 
 	"github.com/go-chi/chi"
 )
